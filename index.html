@@ -11,18 +11,22 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
     <script src="js/main.js" defer></script>
     <link rel="stylesheet" href="styles/style.css">
-    <title>Document</title>
+    <title>Mi Tienda</title>
 </head>
 <body>
     <h1 id="titulo">Mi Tienda</h1>
     
     <div class="controles">
-    <input id="input-nombre" placeholder="Nombre del producto">
-    <input type="number" id = "input-precio" placeholder="Precio">
-    <button id="btn-agregar">Agregar</button>
-    <input id="input-busqueda" placeholder="Buscar producto...">
-    </div>
-
+        <div class="fila-superior">
+            <input id="input-nombre" placeholder="Nombre del producto">
+            <input type="number" id = "input-precio" placeholder="Precio">
+            <button id="btn-agregar">Agregar</button>
+        </div>
+    
+        <input id="input-busqueda" placeholder="Buscar producto...">
+        
+        <button id="btn-vaciar" class="btn-vaciar">Vaciar inventario</button>
+    
     <div id="contenedor-productos"></div>
     
 </body>

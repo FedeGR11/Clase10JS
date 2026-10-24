@@ -3,7 +3,7 @@ const inputPrecio = document.getElementById("input-precio");
 const btnAgregar = document.getElementById("btn-agregar");
 const inputBusqueda = document.getElementById("input-busqueda");
 const contenedorProductos = document.getElementById("contenedor-productos");
-
+const btnVaciar = document.getElementById("btn-vaciar");
 
 
 let productosJS = [];
@@ -60,6 +60,7 @@ function renderizarProductos(lista) {
                 <h3>${nombre}</h3>
                 <span>ID:${id}</span>
                 <p>Precio: $${precio}</p>
+                <button class="btn-editar" data-id="${id}">Editar precio</button>
                 <button class="btn-eliminar" data-id="${id}">Eliminar</button>
             </div>
          `;
@@ -176,5 +177,84 @@ contenedorProductos.addEventListener("click", (e) => {
             }
         });
     }
+    if (e.target?.classList.contains("btn-editar")) {
+        try {
+            const idAEditar = parseInt(e.target.getAttribute("data-id"));
+            if (isNaN(idAEditar)) {
+                throw new Error("No se pudo identificar el producto a editar.");
+            }
+            const producto = productosJS.find(p => p.id === idAEditar);
+            if (!producto) {
+                throw new Error("Producto no encontrado para editar.");
+            }
+
+            const nuevoPrecio = parseFloat(prompt(`Nuevo precio para "${producto.nombre}":`, producto.precio));
+            if (isNaN(nuevoPrecio) || nuevoPrecio <= 0) {
+                throw new Error("El precio ingresado no es válido.");
+            }
+
+            producto.precio = nuevoPrecio;
+            guardarLocalStorage();
+            actualizarVista();
+
+            Toastify({
+                text: `✏️ Precio de "${producto.nombre}" actualizado a $${nuevoPrecio}.`,
+                duration: 3000,
+                gravity: "bottom",
+                position: "right",
+                style: { background: "#28a745" }
+            }).showToast();
+        } catch (error) {
+            Toastify({
+                text: `⚠️ ${error.message}`,
+                duration: 3000,
+                gravity: "bottom",
+                position: "right",
+                style: { background: "#dc3545" }
+            }).showToast();
+        }
+    }
 });
+
+btnVaciar.addEventListener("click", () => {
+    try {
+        if (productosJS.length === 0) {
+            throw new Error("El inventario ya se encuentra vacío.");
+        }
+
+        Swal.fire({
+            title: "¿Vaciar todo el inventario?",
+            text: "Esta acción eliminará todos los productos registrados.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#dc3545",
+            cancelButtonColor: "#6c757d",
+            confirmButtonText: "Sí, vaciar",
+            cancelButtonText: "Cancelar"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                productosJS.length = 0;
+                guardarLocalStorage();
+                actualizarVista();
+
+                Toastify({
+                    text: "🧹 Se vació todo el inventario correctamente.",
+                    duration: 3000,
+                    gravity: "bottom",
+                    position: "right",
+                    style: { background: "#dc3545" }
+                }).showToast();
+            }
+        });
+    } catch (error) {
+        Toastify({
+            text: `⚠️ ${error.message}`,
+            duration: 3000,
+            gravity: "bottom",
+            position: "right",
+            style: { background: "#dc3545" }
+        }).showToast();
+    }
+});
+
 

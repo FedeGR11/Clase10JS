@@ -13,14 +13,38 @@ h1 {
   margin-bottom: 25px;
 }
 
-/* Botenes e inputs */
+/* Botones e inputs */
 .controles {
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 15px;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 750px;
+  margin: 0 auto 25px auto;
 }
 
+.fila-superior {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  width: 100%;
+}
+
+#input-nombre {
+  flex: 2;
+}
+
+#input-precio {
+  flex: 1;
+}
+
+#input-busqueda {
+  width: 100%;
+}
+
+#btn-vaciar {
+  width: auto !important;
+  align-self: flex-start;  
+}
 
 input {
   padding: 10px 12px;
@@ -42,6 +66,7 @@ input:focus {
   border-radius: 6px;
   cursor: pointer;
   font-weight: bold;
+  white-space: nowrap;
   transition: background-color 0.2s;
 }
 
@@ -94,8 +119,9 @@ input:focus {
   margin: 0 0 15px 0;
 }
 
-/* Botón eliminar */
-.btn-eliminar {
+/* Botón eliminar y botón vaciar */
+.btn-eliminar,
+.btn-vaciar {
   padding: 8px;
   background-color: #e74c3c;
   color: white;
@@ -106,19 +132,40 @@ input:focus {
   transition: background-color 0.2s;
 }
 
-.btn-eliminar:hover {
+.btn-eliminar:hover,
+.btn-vaciar:hover {
   background-color: #c0392b;
+}
+
+.btn-editar {
+  padding: 8px;
+  margin-bottom: 8px;
+  background-color: #3265d3;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background-color 0.2s;
+}
+
+.btn-editar:hover {
+  background-color: #3265d3;
 }
 
 /* Color de mensajes */
 .mensaje-exito {
+  margin-top: 10px;
   color: #2ecc71;
 }
 
 .mensaje-error {
   color: #e74c3c;
+  margin-top: 10px;
+
 }
 
 .mensaje-alerta {
   color: #e67e22;
+  margin-top: 10px;
 }
