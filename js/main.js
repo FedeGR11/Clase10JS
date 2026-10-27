@@ -5,17 +5,14 @@ const inputBusqueda = document.getElementById("input-busqueda");
 const contenedorProductos = document.getElementById("contenedor-productos");
 const btnVaciar = document.getElementById("btn-vaciar");
 
-
 let productosJS = [];
 
 async function inicializarProductos() {
     const productosGuardados = localStorage.getItem("productosJS");
     if (productosGuardados) {
-
         productosJS = JSON.parse(productosGuardados);
         actualizarVista();
     } else {
-
         try {
             const response = await fetch("./data/data.json");
 
@@ -74,7 +71,6 @@ function actualizarVista() {
     renderizarProductos(productosFiltrados);
 }
 
-
 setTimeout(() => {
     Toastify({
         text: "🔔 Sistema de inventario cargado correctamente. Datos sincronizados.",
@@ -85,23 +81,19 @@ setTimeout(() => {
     }).showToast();
 }, 3000);
 
-
 btnAgregar.addEventListener("click", () => {
-
     try {
         const nombre = inputNombre.value.trim();
         const precio = parseFloat(inputPrecio.value);
 
         if (nombre === "" || isNaN(precio) || precio <= 0) {
-            throw new Error("Por favor, ingrese un nombre y un precio valido.");
+            throw new Error("Por favor, ingrese un nombre y un precio válido.");
         }
 
         const nuevoId = productosJS.length > 0 ? Math.max(...productosJS.map(p => p.id)) + 1 : 1;
-
         const nuevoProducto = { id: nuevoId, nombre, precio };
 
         productosJS.push(nuevoProducto);
-
         guardarLocalStorage();
         actualizarVista();
 
@@ -121,12 +113,10 @@ btnAgregar.addEventListener("click", () => {
             position: "right",
             style: { background: "#dc3545" }
         }).showToast();
-
     } finally {
         inputNombre.value = "";
         inputPrecio.value = "";
     }
-
 });
 
 inputBusqueda.addEventListener("keyup", (e) => {
@@ -134,6 +124,7 @@ inputBusqueda.addEventListener("keyup", (e) => {
 });
 
 contenedorProductos.addEventListener("click", (e) => {
+    // 📌 Eliminación de producto
     if (e.target?.classList.contains("btn-eliminar")) {
         const idAEliminar = parseInt(e.target.getAttribute("data-id"));
 
@@ -146,7 +137,6 @@ contenedorProductos.addEventListener("click", (e) => {
             return;
         }
 
-        // 📌 SweetAlert2 con confirmación modal antes de eliminar
         Swal.fire({
             title: "¿Estás seguro?",
             text: "Esta acción eliminará el producto del inventario.",
@@ -165,7 +155,6 @@ contenedorProductos.addEventListener("click", (e) => {
                     guardarLocalStorage();
                     actualizarVista();
 
-                    // Notificación tipo toast confirmando eliminación
                     Toastify({
                         text: "🗑️ Producto eliminado con éxito",
                         duration: 3000,
@@ -177,42 +166,66 @@ contenedorProductos.addEventListener("click", (e) => {
             }
         });
     }
+
+    // 📌 Edición de precio con SweetAlert2 (Modal en lugar de prompt)
     if (e.target?.classList.contains("btn-editar")) {
-        try {
-            const idAEditar = parseInt(e.target.getAttribute("data-id"));
-            if (isNaN(idAEditar)) {
-                throw new Error("No se pudo identificar el producto a editar.");
-            }
-            const producto = productosJS.find(p => p.id === idAEditar);
-            if (!producto) {
-                throw new Error("Producto no encontrado para editar.");
-            }
+        const idAEditar = parseInt(e.target.getAttribute("data-id"));
 
-            const nuevoPrecio = parseFloat(prompt(`Nuevo precio para "${producto.nombre}":`, producto.precio));
-            if (isNaN(nuevoPrecio) || nuevoPrecio <= 0) {
-                throw new Error("El precio ingresado no es válido.");
-            }
-
-            producto.precio = nuevoPrecio;
-            guardarLocalStorage();
-            actualizarVista();
-
+        if (isNaN(idAEditar)) {
             Toastify({
-                text: `✏️ Precio de "${producto.nombre}" actualizado a $${nuevoPrecio}.`,
+                text: "⚠️ No se pudo identificar el producto a editar.",
                 duration: 3000,
-                gravity: "bottom",
-                position: "right",
-                style: { background: "#28a745" }
-            }).showToast();
-        } catch (error) {
-            Toastify({
-                text: `⚠️ ${error.message}`,
-                duration: 3000,
-                gravity: "bottom",
-                position: "right",
                 style: { background: "#dc3545" }
             }).showToast();
+            return;
         }
+
+        const producto = productosJS.find(p => p.id === idAEditar);
+        if (!producto) {
+            Toastify({
+                text: "⚠️ Producto no encontrado para editar.",
+                duration: 3000,
+                style: { background: "#dc3545" }
+            }).showToast();
+            return;
+        }
+
+        Swal.fire({
+            title: `Editar precio de "${producto.nombre}"`,
+            input: "number",
+            inputValue: producto.precio,
+            inputAttributes: {
+                min: 0,
+                step: "any"
+            },
+            showCancelButton: true,
+            confirmButtonText: "Guardar",
+            cancelButtonText: "Cancelar",
+            confirmButtonColor: "#28a745",
+            cancelButtonColor: "#6c757d",
+            inputValidator: (value) => {
+                const precioValido = parseFloat(value);
+                if (!value || isNaN(precioValido) || precioValido <= 0) {
+                    return "Por favor, ingrese un precio válido mayor a 0.";
+                }
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const nuevoPrecio = parseFloat(result.value);
+
+                producto.precio = nuevoPrecio;
+                guardarLocalStorage();
+                actualizarVista();
+
+                Toastify({
+                    text: `✏️ Precio de "${producto.nombre}" actualizado a $${nuevoPrecio}.`,
+                    duration: 3000,
+                    gravity: "bottom",
+                    position: "right",
+                    style: { background: "#28a745" }
+                }).showToast();
+            }
+        });
     }
 });
 
